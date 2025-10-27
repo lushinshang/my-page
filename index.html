@@ -1,0 +1,1453 @@
+
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>船舶網路韌性分析系統 - 資料處理流程圖</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', 'Microsoft JhengHei', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 40px;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #2d3748;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #718096;
+            margin-bottom: 40px;
+            font-size: 1.1em;
+        }
+        
+        .version-info {
+            text-align: center;
+            color: #a0aec0;
+            margin-bottom: 30px;
+            font-size: 0.9em;
+        }
+        
+        .flow-container {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            margin-top: 40px;
+        }
+        
+        .stage {
+            background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+            border-radius: 12px;
+            padding: 30px;
+            border-left: 6px solid #4299e1;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .stage:hover {
+            transform: translateX(10px);
+            box-shadow: 0 8px 24px rgba(66, 153, 225, 0.15);
+        }
+        
+        .stage.stage-input { border-left-color: #48bb78; }
+        .stage.stage-docling { border-left-color: #ed8936; }
+        .stage.stage-gemma { border-left-color: #9f7aea; }
+        .stage.stage-expert { border-left-color: #f56565; }
+        .stage.stage-gptoss { border-left-color: #38b2ac; }
+        .stage.stage-output { border-left-color: #4299e1; }
+        .stage.stage-parallel { border-left-color: #f6ad55; }
+        
+        .stage-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .stage-number {
+            background: #4299e1;
+            color: white;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.3em;
+            flex-shrink: 0;
+        }
+        
+        .stage-input .stage-number { background: #48bb78; }
+        .stage-docling .stage-number { background: #ed8936; }
+        .stage-gemma .stage-number { background: #9f7aea; }
+        .stage-expert .stage-number { background: #f56565; }
+        .stage-gptoss .stage-number { background: #38b2ac; }
+        .stage-output .stage-number { background: #4299e1; }
+        .stage-parallel .stage-number { background: #f6ad55; }
+        
+        .stage-title {
+            flex: 1;
+        }
+        
+        .stage-title h2 {
+            color: #2d3748;
+            font-size: 1.8em;
+            margin-bottom: 5px;
+        }
+        
+        .stage-title .subtitle {
+            color: #718096;
+            font-size: 0.95em;
+            margin: 0;
+        }
+        
+        .stage-meta {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .meta-item {
+            background: white;
+            padding: 8px 16px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9em;
+        }
+        
+        .meta-label {
+            color: #718096;
+            font-weight: 600;
+        }
+        
+        .meta-value {
+            color: #2d3748;
+        }
+        
+        .stage-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .content-box {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .content-box h3 {
+            color: #4299e1;
+            margin-bottom: 12px;
+            font-size: 1.1em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .content-box ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        
+        .content-box li {
+            padding: 6px 0;
+            color: #4a5568;
+            display: flex;
+            align-items: start;
+            gap: 8px;
+        }
+        
+        .content-box li:before {
+            content: "▸";
+            color: #4299e1;
+            font-weight: bold;
+        }
+        
+        .arrow {
+            text-align: center;
+            color: #a0aec0;
+            font-size: 2em;
+            margin: -10px 0;
+        }
+        
+        .metrics {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-top: 40px;
+        }
+        
+        .metrics h2 {
+            text-align: center;
+            margin-bottom: 25px;
+            font-size: 2em;
+        }
+        
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        
+        .metric-card {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .metric-value {
+            font-size: 2.5em;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+        
+        .metric-label {
+            font-size: 0.95em;
+            opacity: 0.9;
+        }
+        
+        .legend {
+            background: #f7fafc;
+            padding: 25px;
+            border-radius: 12px;
+            margin-top: 30px;
+        }
+        
+        .legend h3 {
+            color: #2d3748;
+            margin-bottom: 15px;
+        }
+        
+        .legend-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px;
+            background: white;
+            border-radius: 8px;
+        }
+        
+        .legend-color {
+            width: 30px;
+            height: 30px;
+            border-radius: 6px;
+        }
+        
+        .code-block {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            overflow-x: auto;
+            margin-top: 15px;
+        }
+        
+        .highlight {
+            background: #fef5e7;
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: #d97706;
+            font-weight: 600;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+        
+        .badge-new { background: #c6f6d5; color: #22543d; }
+        .badge-important { background: #fed7d7; color: #742a2a; }
+        .badge-fast { background: #bee3f8; color: #2c5282; }
+        
+        /* Mermaid 流程圖樣式 */
+        .mermaid-container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-top: 40px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .mode-comparison {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+        
+        .mode-card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            border: 3px solid #e2e8f0;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .mode-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 24px rgba(0,0,0,0.15);
+        }
+        
+        .mode-card.fast-mode {
+            border-color: #4299e1;
+        }
+        
+        .mode-card.critical-mode {
+            border-color: #ed8936;
+        }
+        
+        .mode-card.expert-mode {
+            border-color: #f56565;
+        }
+        
+        .mode-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+        }
+        
+        .mode-card.fast-mode::before {
+            background: linear-gradient(90deg, #4299e1, #667eea);
+        }
+        
+        .mode-card.critical-mode::before {
+            background: linear-gradient(90deg, #ed8936, #f6ad55);
+        }
+        
+        .mode-card.expert-mode::before {
+            background: linear-gradient(90deg, #f56565, #fc8181);
+        }
+        
+        .mode-card h3 {
+            color: #2d3748;
+            font-size: 1.6em;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .mode-icon {
+            font-size: 1.4em;
+        }
+        
+        .mode-time {
+            background: #f7fafc;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 1.1em;
+        }
+        
+        .mode-time strong {
+            color: #2d3748;
+            font-size: 1.5em;
+            display: block;
+            margin-bottom: 5px;
+        }
+        
+        .mode-stages {
+            margin-top: 20px;
+        }
+        
+        .mode-stage {
+            padding: 12px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            background: #f7fafc;
+            border-left: 4px solid #cbd5e0;
+            transition: all 0.2s ease;
+        }
+        
+        .mode-stage:hover {
+            background: #edf2f7;
+            border-left-color: #4299e1;
+        }
+        
+        .mode-stage.enabled {
+            background: #e6fffa;
+            border-left-color: #38b2ac;
+        }
+        
+        .mode-stage.disabled {
+            background: #fff5f5;
+            border-left-color: #fc8181;
+            opacity: 0.6;
+        }
+        
+        .mode-stage-name {
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 4px;
+        }
+        
+        .mode-stage-desc {
+            font-size: 0.9em;
+            color: #718096;
+        }
+        
+        .feature-list {
+            list-style: none;
+            padding: 0;
+            margin-top: 15px;
+        }
+        
+        .feature-list li {
+            padding: 8px 0;
+            display: flex;
+            align-items: start;
+            gap: 10px;
+            color: #4a5568;
+        }
+        
+        .feature-list li::before {
+            content: "✓";
+            color: #48bb78;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+        
+        .feature-list.disabled li::before {
+            content: "✗";
+            color: #fc8181;
+        }
+        
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .comparison-table th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+        
+        .comparison-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .comparison-table tr:hover {
+            background: #f7fafc;
+        }
+        
+        .status-yes {
+            color: #48bb78;
+            font-weight: 600;
+        }
+        
+        .status-no {
+            color: #fc8181;
+            font-weight: 600;
+        }
+        
+        .status-partial {
+            color: #ed8936;
+            font-weight: 600;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <script>
+        mermaid.initialize({ 
+            startOnLoad: true,
+            theme: 'default',
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis'
+            }
+        });
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>🚢 船舶網路韌性分析系統</h1>
+        <div class="subtitle">資料處理流程圖 - Data Flow Diagram</div>
+        <div class="version-info">系統版本 v2.9.0 | 雙模型 AI 架構 | 最後更新：2025-10-27</div>
+        
+        <!-- 並行處理入口 -->
+        <div class="flow-container">
+            <div class="stage stage-parallel">
+                <div class="stage-header">
+                    <div class="stage-number">🔀</div>
+                    <div class="stage-title">
+                        <h2>並行處理入口 <span class="badge badge-new">NEW</span></h2>
+                        <div class="subtitle">智慧型資源調度 - Parallel Processing Gateway</div>
+                    </div>
+                </div>
+                <div class="stage-meta">
+                    <div class="meta-item">
+                        <span class="meta-label">腳本:</span>
+                        <span class="meta-value highlight">parallel_run.sh</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">模式:</span>
+                        <span class="meta-value">fast / critical / expert</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">自動調校:</span>
+                        <span class="meta-value">✅ 啟用</span>
+                    </div>
+                </div>
+                <div class="stage-content">
+                    <div class="content-box">
+                        <h3>📊 資源偵測</h3>
+                        <ul>
+                            <li>偵測可用記憶體 (GB)</li>
+                            <li>偵測 CPU 核心數</li>
+                            <li>計算最佳並行數</li>
+                            <li>安全係數保護 (80% RAM, 預留核心)</li>
+                        </ul>
+                    </div>
+                    <div class="content-box">
+                        <h3>⚙️ 動態決策</h3>
+                        <ul>
+                            <li>記憶體上限 = 可用 RAM × 0.8 ÷ 10GB</li>
+                            <li>CPU 上限 = 核心數 - 2</li>
+                            <li>並行數 = min(記憶體上限, CPU上限)</li>
+                            <li>M4 Max 建議: 4-6 個並行任務</li>
+                        </ul>
+                    </div>
+                    <div class="content-box">
+                        <h3>🚀 批次執行</h3>
+                        <ul>
+                            <li>掃描 pdf/ 資料夾所有檔案</li>
+                            <li>使用 xargs -P 並行處理</li>
+                            <li>自動跳過已分析檔案</li>
+                            <li>斷點續傳支援</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="code-block">
+./parallel_run.sh  # 自動偵測資源並執行
+export RAM_PER_JOB_GB=8  # 可選：調整記憶體估算
+export RESERVED_CORES=4   # 可選：調整預留核心
+                </div>
+            </div>
+            
+            <div class="arrow">⬇</div>
+            
+            <!-- 階段 0: 輸入 -->
+            <div class="stage stage-input">
+                <div class="stage-header">
+                    <div class="stage-number">📥</div>
+                    <div class="stage-title">
+                        <h2>輸入階段</h2>
+                        <div class="subtitle">PDF 文件接收與前處理</div>
+                    </div>
+                </div>
+                <div class="stage-meta">
+                    <div class="meta-item">
+                        <span class="meta-label">入口:</span>
+                        <span class="meta-value">run.sh</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">協調器:</span>
+                        <span class="meta-value">dual_model_processor.py</span>
+                    </div>
+                </div>
+                <div class="stage-content">
+                    <div class="content-box">
+                        <h3>📄 檔案檢查</h3>
+                        <ul>
+                            <li>驗證 PDF 檔案存在</li>
+                            <li>檢測掃描型 PDF (OCR 需求)</li>
+                            <li>檢查已存在輸出 (斷點續傳)</li>
+                            <li>建立輸出目錄結構</li>
+                        </ul>
+                    </div>
+                    <div class="content-box">
+                        <h3>⚙️ 模式選擇</h3>
+                        <ul>
+                            <li><strong>fast</strong>: 僅 Gemma3 提取 (~49秒)</li>
+                            <li><strong>critical</strong>: 完整分析 (~76秒)</li>
+                            <li><strong>expert</strong>: 專家團隊模式 (~10.7分鐘) <span class="badge badge-new">v3.1</span></li>
+                        </ul>
+                    </div>
+                    <div class="content-box">
+                        <h3>🔍 初步分析</h3>
+                        <ul>
+                            <li>PDF 頁數統計</li>
+                            <li>文件元資料提取</li>
+                            <li>處理時間估算</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="arrow">⬇</div>
+            
+            <!-- 階段 1: Docling -->
+            <div class="stage stage-docling">
+                <div class="stage-header">
+                    <div class="stage-number">1</div>
+                    <div class="stage-title">
+                        <h2>文件處理層</h2>
+                        <div class="subtitle">Docling PDF 解析引擎</div>
+                    </div>
+                </div>
+                <div class="stage-meta">
+                    <div class="meta-item">
+                        <span class="meta-label">模組:</span>
+                        <span class="meta-value">docling_processor.py</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">處理時間:</span>
+                        <span class="meta-value">~38 秒</span>
+                    </div>
+                </div>
+                <div class="stage-content">
+                    <div class="content-box">
+                        <h3>📝 文字提取</h3>
+                        <ul>
+                            <li>提取所有頁面文字內容</li>
+                            <li>保留文字排版結構</li>
+                            <li>生成 Markdown 格式</li>
+                            <li>處理表格與列表</li>
+                        </ul>
+                    </div>
+                    <div class="content-box">
+                        <h3>🖼️ 圖片處理</h3>
+                        <ul>
+                            <li>提取所有嵌入圖片</li>
+                            <li>按頁碼命名 (page_N.png)</li>
+                            <li>保存至 tmp_docling/</li>
+                            <li>支援 OCR 需求</li>
+                        </ul>
+                    </div>
+                    <div class="content-box">
+                        <h3>📦 輸出資料</h3>
+                        <ul>
+                            <li>DoclingOutput 資料結構</li>
+                            <li>full_markdown: 完整文字</li>
+                            <li>images: 圖片路徑清單</li>
+                            <li>total_pages: 頁數統計</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="arrow">⬇</div>
+            
+            <!-- 階段 2: Gemma3 基礎分析 -->
+            <div class="stage stage-gemma">
+                <div class="stage-header">
+                    <div class="stage-number">2</div>
+                    <div class="stage-title">
+                        <h2>AI 設備提取層 <span class="badge badge-important">準確度 100%</span></h2>
+                        <div class="subtitle">Gemma3:12b 多模態分析</div>
+                    </div>
+                </div>
+                <div class="stage-meta">
+                    <div class="meta-item">
+                        <span class="meta-label">模型:</span>
+                        <span class="meta-value">gemma3:12b (Ollama)</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">處理時間:</span>
+                        <span class="meta-value">~7 秒</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">A/B 測試:</span>
+                        <span class="meta-value">✅ 勝出 LLaVA:13b</span>
+                    </div>
+                </div>
+                <div class="stage-content">
+                    <div class="content-box">
+                        <h3>🔍 設備資訊提取</h3>
+                        <ul>
+                            <li>設備名稱與類型</li>
+                            <li>製造商與型號</li>
+                            <li>功能描述</li>
+                            <li>技術規格</li>
+                        </ul>
+                    </div>
+                    <div class="content-box">
+                        <h3>🔑 關鍵字分析</h3>
+                        <ul>
+                            <li>8 大類別 100+ 關鍵字</li>
+                            <li>網路介面 (Ethernet, RS-232, Wi-Fi)</li>
+                            <li>通訊協定 (NMEA, Modbus, TCP/IP)</li>
+                            <li>安全設備 (Firewall, Router, PLC)</li>
+                        </ul>
+                    </div>
+                    <div class="content-box">
+                        <h3>📍 九宮格定位 <span class="badge badge-new">v2.9</span></h3>
+                        <ul>
+                            <li>關鍵字頁面位置分析</li>
+                            <li>視覺化 3×3 網格定位</li>
+                            <li>keyword_position_analyzer.py</li>
+                            <li>互動式 HTML 呈現</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="arrow">⬇</div>
+            
+            <!-- 階段 2.5: Expert Team (條件式) -->
+            <div class="stage stage-expert">
+                <div class="stage-header">
+                    <div class="stage-number">2.5</div>
+                    <div class="stage-title">
+                        <h2>專家團隊分析層 <span class="badge badge-new">v3.1</span></h2>
+                        <div class="subtitle">逐頁深度分析 (僅 expert 模式)</div>
+                    </div>
+                </div>
+                <div class="stage-meta">
+                    <div class="meta-item">
+                        <span class="meta-label">模組:</span>
+                        <span class="meta-value">expert_team_processor.py</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">處理時間:</span>
+                        <span class="meta-value">~10.7 分鐘/設備</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">觸發條件:</span>
+                        <span class="meta-value">mode == "expert"</span>
+                    </div>
+                </div>
+                <div class="stage-content">
+                    <div class="content-box">
+                        <h3>📄 文字專家 (Gemma3:12b)</h3>
+                        <ul>
+                            <li>逐頁文字內容摘要</li>
+                            <li>關鍵資訊提取</li>
+                            <li>技術細節識別</li>
+                            <li>並行處理每一頁</li>
+                        </ul>
+                    </div>
+                    <div class="content-box">
+                        <h3>🖼️ 圖片專家 (Gemma3:12b)</h3>
+                        <ul>
+                            <li>逐頁圖片視覺分析</li>
+                            <li>架構圖解讀</li>
+                            <li>技術圖表識別</li>
+                            <li>多模態理解</li>
+                        </ul>
+                    </div>
+                    <div class="content-box">
+                        <h3>🔍 語意驗證</h3>
+                        <ul>
+                            <li>弱證據關鍵字過濾</li>
+                            <li>"Switch" 非電源開關</li>
+                            <li>"AP" 非輔助泵</li>
+                            <li>專家摘要交叉驗證</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="arrow">⬇</div>
+            
+            <!-- 階段 3: GPT-OSS 標準評估 -->
+            <div class="stage stage-gptoss">
+                <div class="stage-header">
+                    <div class="stage-number">3</div>
+                    <div class="stage-title">
+                        <h2>標準條文評估層</h2>
+                        <div class="subtitle">GPT-OSS:20b 深度分析 (僅 critical/expert 模式)</div>
+                    </div>
+                </div>
+                <div class="stage-meta">
+                    <div class="meta-item">
+                        <span class="meta-label">模組:</span>
+                        <span class="meta-value">gpt_oss_analyzer.py</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">模型:</span>
+                        <span class="meta-value">gpt-oss:20b (Ollama)</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">處理時間:</span>
+                        <span class="meta-value">~31 秒 (平均 167.6 秒)</span>
+                    </div>
+                </div>
+                <div class="stage-content">
+                    <div class="content-box">
+                        <h3>📊 系統分類</h3>
+                        <ul>
+                            <li>Type 1 / Type 2 判定</li>
+                            <li>依據 IACS UR E26 §7.2</li>
+                            <li>準確率: 100%</li>
+                            <li>包含詳細理由說明</li>
+                        </ul>
+                    </div>
+                    <div class="content-box">
+                        <h3>✓ 合規性檢查</h3>
+                        <ul>
+                            <li>287 條款完整索引</li>
+                            <li>§7.2.3 Type 2 要求</li>
+                            <li>逐項符合度評估</li>
+                            <li>部分符合標記 (partial)</li>
+                        </ul>
+                    </div>
+                    <div class="content-box">
+                        <h3>🛡️ 安全建議</h3>
+                        <ul>
+                            <li>§8.3 排除條件評估</li>
+                            <li>§9 補償措施建議</li>
+                            <li>優先行動清單</li>
+                            <li>風險等級評估</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="stage-content">
+                    <div class="content-box">
+                        <h3>🔄 穩健性機制 <span class="badge badge-important">v2.7</span></h3>
+                        <ul>
+                            <li>自動重試 2 次 (成功率 +30~50%)</li>
+                            <li>逾時保護 (300 秒)</li>
+                            <li>降級模式: 跳過 GPT-OSS 分析</li>
+                            <li>完整錯誤記錄</li>
+                        </ul>
+                    </div>
+                    <div class="content-box">
+                        <h3>📚 標準載入器</h3>
+                        <ul>
+                            <li>standards_loader.py</li>
+                            <li>287 條款中英對照</li>
+                            <li>114 專業術語雙語</li>
+                            <li>5 大類別分類索引</li>
+                        </ul>
+                    </div>
+                    <div class="content-box">
+                        <h3>🎯 審慎精確原則 <span class="badge badge-important">v2.7</span></h3>
+                        <ul>
+                            <li>懷疑論原則</li>
+                            <li>弱證據過濾</li>
+                            <li>程式碼驗證邏輯</li>
+                            <li>避免簡單設備誤判</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="arrow">⬇</div>
+            
+            <!-- 階段 4: 報告生成 -->
+            <div class="stage stage-output">
+                <div class="stage-header">
+                    <div class="stage-number">4</div>
+                    <div class="stage-title">
+                        <h2>報告生成層</h2>
+                        <div class="subtitle">互動式 HTML + 結構化 JSON</div>
+                    </div>
+                </div>
+                <div class="stage-meta">
+                    <div class="meta-item">
+                        <span class="meta-label">模組:</span>
+                        <span class="meta-value">enhanced_report_generator.py</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">輸出目錄:</span>
+                        <span class="meta-value">dual_model_output/</span>
+                    </div>
+                </div>
+                <div class="stage-content">
+                    <div class="content-box">
+                        <h3>📊 HTML 報告 (10 章節)</h3>
+                        <ul>
+                            <li>1. 文件概述與處理時間</li>
+                            <li>2. 設備資訊 (AI 提取)</li>
+                            <li>3. 關鍵字索引與頁碼</li>
+                            <li>4. 統計分析圖表</li>
+                            <li>5. 系統分類 (Type 1/2)</li>
+                            <li>6. 合規性檢查</li>
+                            <li>7. 排除條件評估</li>
+                            <li>8. 補償措施建議</li>
+                            <li>9. 安全建議清單</li>
+                            <li>10. 關鍵字九宮格定位 <span class="badge badge-new">v2.9</span></li>
+                        </ul>
+                    </div>
+                    <div class="content-box">
+                        <h3>📄 JSON 資料結構</h3>
+                        <ul>
+                            <li>analysis_result.json</li>
+                            <li>設備資訊結構化資料</li>
+                            <li>關鍵字分析結果</li>
+                            <li>GPT-OSS 評估完整內容</li>
+                            <li>處理時間統計</li>
+                        </ul>
+                    </div>
+                    <div class="content-box">
+                        <h3>📁 輸出檔案</h3>
+                        <ul>
+                            <li>設備名_analysis_report.html</li>
+                            <li>設備名_analysis_result.json</li>
+                            <li>設備名_full_markdown.md</li>
+                            <li>圖片檔案 (page_N.png)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 效能指標 -->
+        <div class="metrics">
+            <h2>⚡ 效能指標</h2>
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-value">49秒</div>
+                    <div class="metric-label">fast 模式</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">76秒</div>
+                    <div class="metric-label">critical 模式</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">10.7分</div>
+                    <div class="metric-label">expert 模式</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">100%</div>
+                    <div class="metric-label">系統分類準確度</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">287</div>
+                    <div class="metric-label">標準條款數</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">4-6x</div>
+                    <div class="metric-label">並行加速比</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 圖例 -->
+        <div class="legend">
+            <h3>🎨 流程階段圖例</h3>
+            <div class="legend-grid">
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #f6ad55;"></div>
+                    <span>並行處理入口 (智慧調度)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #48bb78;"></div>
+                    <span>輸入階段 (PDF 接收)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #ed8936;"></div>
+                    <span>文件處理 (Docling)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #9f7aea;"></div>
+                    <span>AI 設備提取 (Gemma3)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #f56565;"></div>
+                    <span>專家團隊 (Expert Mode)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #38b2ac;"></div>
+                    <span>標準評估 (GPT-OSS)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #4299e1;"></div>
+                    <span>報告生成 (HTML + JSON)</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 技術架構 -->
+        <div class="legend" style="margin-top: 30px;">
+            <h3>🛠️ 技術架構</h3>
+            <div class="stage-content" style="margin-top: 20px;">
+                <div class="content-box">
+                    <h3>🤖 AI 模型</h3>
+                    <ul>
+                        <li><strong>Gemma3:12b</strong>: 多模態提取 (文字+圖片)</li>
+                        <li><strong>GPT-OSS:20b</strong>: 標準條文評估</li>
+                        <li><strong>Ollama</strong>: 本地 LLM 執行環境</li>
+                        <li>支援並行推論 (共享模型實例)</li>
+                    </ul>
+                </div>
+                <div class="content-box">
+                    <h3>📦 核心模組</h3>
+                    <ul>
+                        <li>dual_model_processor.py (協調器)</li>
+                        <li>docling_processor.py (PDF 解析)</li>
+                        <li>expert_team_processor.py (專家團隊)</li>
+                        <li>gpt_oss_analyzer.py (標準評估)</li>
+                        <li>keyword_analyzer.py (關鍵字引擎)</li>
+                        <li>enhanced_report_generator.py (報告)</li>
+                    </ul>
+                </div>
+                <div class="content-box">
+                    <h3>⚙️ 執行腳本</h3>
+                    <ul>
+                        <li><strong>parallel_run.sh</strong>: 並行批次處理 🔥</li>
+                        <li><strong>run.sh</strong>: 單檔處理入口</li>
+                        <li>支援 3 種模式: fast / critical / expert</li>
+                        <li>自動斷點續傳</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 使用範例 -->
+        <div class="legend" style="margin-top: 30px;">
+            <h3>💻 使用範例</h3>
+            <div class="code-block">
+# 🔥 推薦：智慧並行處理 (自動偵測資源)
+./parallel_run.sh
+
+# 單檔處理
+./run.sh "pdf/設備規格書.pdf" critical
+
+# 批次處理
+./run.sh --batch pdf/ expert
+
+# 調整並行參數
+export RAM_PER_JOB_GB=8
+export RESERVED_CORES=4
+./parallel_run.sh
+            </div>
+        </div>
+        
+        <!-- 三種模式比較 -->
+        <div class="legend" style="margin-top: 40px;">
+            <h3>🔀 三種處理模式詳細比較</h3>
+            
+            <!-- Mermaid 流程圖 -->
+            <div class="mermaid-container">
+                <h4 style="text-align: center; color: #2d3748; margin-bottom: 20px;">模式執行流程對比圖</h4>
+                <div class="mermaid">
+graph TD
+    Start([📥 PDF 輸入]) --> Check{檢查模式}
+    
+    Check -->|fast| F1[📄 Docling 處理<br/>~38秒]
+    Check -->|critical| C1[📄 Docling 處理<br/>~38秒]
+    Check -->|expert| E1[📄 Docling 處理<br/>~38秒]
+    
+    F1 --> F2[🤖 Gemma3 提取<br/>~7秒]
+    C1 --> C2[🤖 Gemma3 提取<br/>~7秒]
+    E1 --> E2[🤖 Gemma3 提取<br/>~7秒]
+    
+    F2 --> F3[🔑 關鍵字分析]
+    C2 --> C3[🔑 關鍵字分析]
+    E2 --> E3[🔑 關鍵字分析]
+    
+    F3 --> F4[⏭️ 跳過 GPT-OSS]
+    C3 --> C4[📚 GPT-OSS 評估<br/>~31秒]
+    E3 --> E4[👥 專家團隊分析<br/>~9.7分鐘]
+    
+    F4 --> F5[📊 基礎報告<br/>~4秒]
+    C4 --> C5[📊 完整報告<br/>~4秒]
+    E4 --> E5[📚 GPT-OSS 評估<br/>~31秒]
+    
+    E5 --> E6[📊 深度報告<br/>~4秒]
+    
+    F5 --> EndF([✅ 完成<br/>總計 ~49秒])
+    C5 --> EndC([✅ 完成<br/>總計 ~76秒])
+    E6 --> EndE([✅ 完成<br/>總計 ~10.7分鐘])
+    
+    style F1 fill:#e6fffa
+    style F2 fill:#e6fffa
+    style F3 fill:#e6fffa
+    style F4 fill:#fff5f5
+    style F5 fill:#e6fffa
+    style EndF fill:#c6f6d5
+    
+    style C1 fill:#fef5e7
+    style C2 fill:#fef5e7
+    style C3 fill:#fef5e7
+    style C4 fill:#fef5e7
+    style C5 fill:#fef5e7
+    style EndC fill:#fed7d7
+    
+    style E1 fill:#fff5f5
+    style E2 fill:#fff5f5
+    style E3 fill:#fff5f5
+    style E4 fill:#fff5f5
+    style E5 fill:#fff5f5
+    style E6 fill:#fff5f5
+    style EndE fill:#ffd7d7
+                </div>
+            </div>
+            
+            <!-- 模式卡片比較 -->
+            <div class="mode-comparison">
+                <!-- Fast Mode -->
+                <div class="mode-card fast-mode">
+                    <h3><span class="mode-icon">⚡</span> Fast 模式</h3>
+                    <div class="mode-time">
+                        <strong>~49 秒</strong>
+                        <span style="color: #718096;">快速掃描</span>
+                    </div>
+                    
+                    <div class="mode-stages">
+                        <div class="mode-stage enabled">
+                            <div class="mode-stage-name">✓ Docling PDF 處理</div>
+                            <div class="mode-stage-desc">文字+圖片提取 (~38秒)</div>
+                        </div>
+                        <div class="mode-stage enabled">
+                            <div class="mode-stage-name">✓ Gemma3 基礎提取</div>
+                            <div class="mode-stage-desc">設備資訊+關鍵字 (~7秒)</div>
+                        </div>
+                        <div class="mode-stage disabled">
+                            <div class="mode-stage-name">✗ 專家團隊分析</div>
+                            <div class="mode-stage-desc">未啟用</div>
+                        </div>
+                        <div class="mode-stage disabled">
+                            <div class="mode-stage-name">✗ GPT-OSS 標準評估</div>
+                            <div class="mode-stage-desc">未啟用</div>
+                        </div>
+                        <div class="mode-stage enabled">
+                            <div class="mode-stage-name">✓ 基礎報告生成</div>
+                            <div class="mode-stage-desc">HTML + JSON (~4秒)</div>
+                        </div>
+                    </div>
+                    
+                    <h4 style="margin-top: 20px; color: #2d3748;">適用場景</h4>
+                    <ul class="feature-list">
+                        <li>初步設備清單建立</li>
+                        <li>快速關鍵字掃描</li>
+                        <li>大量設備預處理</li>
+                        <li>非關鍵設備分析</li>
+                    </ul>
+                    
+                    <h4 style="margin-top: 20px; color: #2d3748;">輸出內容</h4>
+                    <ul class="feature-list">
+                        <li>設備基本資訊</li>
+                        <li>關鍵字索引與頁碼</li>
+                        <li>網路特徵統計</li>
+                    </ul>
+                    
+                    <ul class="feature-list disabled">
+                        <li>無系統分類 (Type 1/2)</li>
+                        <li>無合規性評估</li>
+                        <li>無安全建議</li>
+                    </ul>
+                </div>
+                
+                <!-- Critical Mode -->
+                <div class="mode-card critical-mode">
+                    <h3><span class="mode-icon">🎯</span> Critical 模式</h3>
+                    <div class="mode-time">
+                        <strong>~76 秒</strong>
+                        <span style="color: #718096;">標準合規分析</span>
+                    </div>
+                    
+                    <div class="mode-stages">
+                        <div class="mode-stage enabled">
+                            <div class="mode-stage-name">✓ Docling PDF 處理</div>
+                            <div class="mode-stage-desc">文字+圖片提取 (~38秒)</div>
+                        </div>
+                        <div class="mode-stage enabled">
+                            <div class="mode-stage-name">✓ Gemma3 基礎提取</div>
+                            <div class="mode-stage-desc">設備資訊+關鍵字 (~7秒)</div>
+                        </div>
+                        <div class="mode-stage disabled">
+                            <div class="mode-stage-name">✗ 專家團隊分析</div>
+                            <div class="mode-stage-desc">未啟用</div>
+                        </div>
+                        <div class="mode-stage enabled">
+                            <div class="mode-stage-name">✓ GPT-OSS 標準評估</div>
+                            <div class="mode-stage-desc">IACS UR E26/E27 (~31秒)</div>
+                        </div>
+                        <div class="mode-stage enabled">
+                            <div class="mode-stage-name">✓ 完整報告生成</div>
+                            <div class="mode-stage-desc">10章節報告 (~4秒)</div>
+                        </div>
+                    </div>
+                    
+                    <h4 style="margin-top: 20px; color: #2d3748;">適用場景</h4>
+                    <ul class="feature-list">
+                        <li>關鍵設備審查 (ECDIS, GPS)</li>
+                        <li>入級檢驗準備</li>
+                        <li>標準合規性檢查</li>
+                        <li>年度審查文件</li>
+                    </ul>
+                    
+                    <h4 style="margin-top: 20px; color: #2d3748;">輸出內容 (完整)</h4>
+                    <ul class="feature-list">
+                        <li>設備資訊 + 關鍵字分析</li>
+                        <li>Type 1/Type 2 系統分類</li>
+                        <li>287條款合規性評估</li>
+                        <li>排除條件判定</li>
+                        <li>補償措施建議</li>
+                        <li>安全優先行動清單</li>
+                    </ul>
+                </div>
+                
+                <!-- Expert Mode -->
+                <div class="mode-card expert-mode">
+                    <h3><span class="mode-icon">🔬</span> Expert 模式</h3>
+                    <div class="mode-time">
+                        <strong>~10.7 分鐘</strong>
+                        <span style="color: #718096;">深度圖文分析</span>
+                    </div>
+                    
+                    <div class="mode-stages">
+                        <div class="mode-stage enabled">
+                            <div class="mode-stage-name">✓ Docling PDF 處理</div>
+                            <div class="mode-stage-desc">文字+圖片提取 (~38秒)</div>
+                        </div>
+                        <div class="mode-stage enabled">
+                            <div class="mode-stage-name">✓ Gemma3 基礎提取</div>
+                            <div class="mode-stage-desc">設備資訊+關鍵字 (~7秒)</div>
+                        </div>
+                        <div class="mode-stage enabled">
+                            <div class="mode-stage-name">✓ 專家團隊分析 ⭐</div>
+                            <div class="mode-stage-desc">逐頁文字+圖片專家 (~9.7分鐘)</div>
+                        </div>
+                        <div class="mode-stage enabled">
+                            <div class="mode-stage-name">✓ GPT-OSS 標準評估</div>
+                            <div class="mode-stage-desc">含專家團隊上下文 (~31秒)</div>
+                        </div>
+                        <div class="mode-stage enabled">
+                            <div class="mode-stage-name">✓ 深度報告生成</div>
+                            <div class="mode-stage-desc">含專家摘要章節 (~4秒)</div>
+                        </div>
+                    </div>
+                    
+                    <h4 style="margin-top: 20px; color: #2d3748;">適用場景 (v3.1 新增)</h4>
+                    <ul class="feature-list">
+                        <li>複雜架構系統分析</li>
+                        <li>含大量技術圖表的設備</li>
+                        <li>需要圖文並茂理解</li>
+                        <li>關鍵決策依據準備</li>
+                        <li>爭議案件深度調查</li>
+                    </ul>
+                    
+                    <h4 style="margin-top: 20px; color: #2d3748;">獨家功能</h4>
+                    <ul class="feature-list">
+                        <li>逐頁文字專家摘要 (Gemma3)</li>
+                        <li>逐頁圖片視覺分析 (Gemma3)</li>
+                        <li>弱證據語意驗證過濾</li>
+                        <li>專家摘要交叉驗證</li>
+                        <li>更精準的 GPT-OSS 評估</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- 功能對照表 -->
+            <h4 style="margin-top: 40px; color: #2d3748; font-size: 1.4em;">📋 功能對照表</h4>
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>處理階段 / 功能</th>
+                        <th>⚡ Fast</th>
+                        <th>🎯 Critical</th>
+                        <th>🔬 Expert</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Docling PDF 處理</strong></td>
+                        <td class="status-yes">✓ (~38秒)</td>
+                        <td class="status-yes">✓ (~38秒)</td>
+                        <td class="status-yes">✓ (~38秒)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Gemma3 設備提取</strong></td>
+                        <td class="status-yes">✓ (~7秒)</td>
+                        <td class="status-yes">✓ (~7秒)</td>
+                        <td class="status-yes">✓ (~7秒)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>關鍵字分析 (8大類)</strong></td>
+                        <td class="status-yes">✓ 基礎</td>
+                        <td class="status-yes">✓ 基礎</td>
+                        <td class="status-yes">✓ 增強</td>
+                    </tr>
+                    <tr>
+                        <td><strong>九宮格定位 (v2.9)</strong></td>
+                        <td class="status-yes">✓</td>
+                        <td class="status-yes">✓</td>
+                        <td class="status-yes">✓</td>
+                    </tr>
+                    <tr>
+                        <td><strong>專家團隊分析</strong></td>
+                        <td class="status-no">✗</td>
+                        <td class="status-no">✗</td>
+                        <td class="status-yes">✓ (~9.7分鐘)</td>
+                    </tr>
+                    <tr>
+                        <td>　├─ 逐頁文字摘要</td>
+                        <td class="status-no">✗</td>
+                        <td class="status-no">✗</td>
+                        <td class="status-yes">✓ Gemma3</td>
+                    </tr>
+                    <tr>
+                        <td>　├─ 逐頁圖片分析</td>
+                        <td class="status-no">✗</td>
+                        <td class="status-no">✗</td>
+                        <td class="status-yes">✓ Gemma3</td>
+                    </tr>
+                    <tr>
+                        <td>　└─ 弱證據過濾</td>
+                        <td class="status-no">✗</td>
+                        <td class="status-no">✗</td>
+                        <td class="status-yes">✓ 語意驗證</td>
+                    </tr>
+                    <tr>
+                        <td><strong>GPT-OSS 標準評估</strong></td>
+                        <td class="status-no">✗</td>
+                        <td class="status-yes">✓ (~31秒)</td>
+                        <td class="status-yes">✓ 增強版</td>
+                    </tr>
+                    <tr>
+                        <td>　├─ Type 1/2 分類</td>
+                        <td class="status-no">✗</td>
+                        <td class="status-yes">✓ 100%準確</td>
+                        <td class="status-yes">✓ 100%準確</td>
+                    </tr>
+                    <tr>
+                        <td>　├─ 287條款合規性</td>
+                        <td class="status-no">✗</td>
+                        <td class="status-yes">✓</td>
+                        <td class="status-yes">✓ 更精準</td>
+                    </tr>
+                    <tr>
+                        <td>　├─ 排除條件評估</td>
+                        <td class="status-no">✗</td>
+                        <td class="status-yes">✓</td>
+                        <td class="status-yes">✓</td>
+                    </tr>
+                    <tr>
+                        <td>　└─ 補償措施建議</td>
+                        <td class="status-no">✗</td>
+                        <td class="status-yes">✓</td>
+                        <td class="status-yes">✓</td>
+                    </tr>
+                    <tr>
+                        <td><strong>報告章節數</strong></td>
+                        <td class="status-partial">4 章節</td>
+                        <td class="status-yes">10 章節</td>
+                        <td class="status-yes">11 章節</td>
+                    </tr>
+                    <tr>
+                        <td><strong>處理速度</strong></td>
+                        <td class="status-yes">⚡ 最快</td>
+                        <td class="status-partial">⚖️ 平衡</td>
+                        <td class="status-no">🐢 最慢</td>
+                    </tr>
+                    <tr>
+                        <td><strong>分析深度</strong></td>
+                        <td class="status-partial">⭐⭐</td>
+                        <td class="status-yes">⭐⭐⭐⭐</td>
+                        <td class="status-yes">⭐⭐⭐⭐⭐</td>
+                    </tr>
+                    <tr>
+                        <td><strong>並行處理適用性</strong></td>
+                        <td class="status-yes">✓ 極佳 (6-8個)</td>
+                        <td class="status-yes">✓ 良好 (4-6個)</td>
+                        <td class="status-partial">△ 一般 (2-3個)</td>
+                    </tr>
+                    <tr style="background: #f7fafc; font-weight: 600;">
+                        <td><strong>總處理時間</strong></td>
+                        <td><strong>~49 秒</strong></td>
+                        <td><strong>~76 秒</strong></td>
+                        <td><strong>~10.7 分鐘</strong></td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <!-- 選擇建議 -->
+            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; border-radius: 12px; margin-top: 30px;">
+                <h4 style="font-size: 1.5em; margin-bottom: 20px; text-align: center;">🎯 模式選擇建議</h4>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                    <div style="background: rgba(255,255,255,0.15); padding: 20px; border-radius: 10px;">
+                        <div style="font-size: 2em; margin-bottom: 10px;">⚡</div>
+                        <h5 style="font-size: 1.2em; margin-bottom: 10px;">Fast 模式</h5>
+                        <p style="opacity: 0.9; line-height: 1.6;">
+                            <strong>推薦場景：</strong><br>
+                            • 初步篩選大量設備<br>
+                            • 快速關鍵字清單建立<br>
+                            • 非關鍵設備 (泵、閥)<br>
+                            • 預算/時間有限時
+                        </p>
+                    </div>
+                    <div style="background: rgba(255,255,255,0.15); padding: 20px; border-radius: 10px;">
+                        <div style="font-size: 2em; margin-bottom: 10px;">🎯</div>
+                        <h5 style="font-size: 1.2em; margin-bottom: 10px;">Critical 模式 ⭐ 推薦</h5>
+                        <p style="opacity: 0.9; line-height: 1.6;">
+                            <strong>推薦場景：</strong><br>
+                            • 關鍵設備審查 (ECDIS, GPS)<br>
+                            • 入級檢驗標準檔案<br>
+                            • 年度審查準備<br>
+                            • 速度與深度平衡
+                        </p>
+                    </div>
+                    <div style="background: rgba(255,255,255,0.15); padding: 20px; border-radius: 10px;">
+                        <div style="font-size: 2em; margin-bottom: 10px;">🔬</div>
+                        <h5 style="font-size: 1.2em; margin-bottom: 10px;">Expert 模式</h5>
+                        <p style="opacity: 0.9; line-height: 1.6;">
+                            <strong>推薦場景：</strong><br>
+                            • 複雜系統架構圖<br>
+                            • 爭議案件調查<br>
+                            • 關鍵決策依據<br>
+                            • 需要最高準確度時
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div style="text-align: center; margin-top: 40px; color: #718096; font-size: 0.9em;">
+            <p>📚 詳細文檔: README.md | CLAUDE.md | develop.html</p>
+            <p>🔗 GitHub: exam01 圖說 | 版本: v2.9.0 + Parallel Processing</p>
+            <p>⚡ 由 Claude Code 生成 | 2025-10-27</p>
+        </div>
+    </div>
+</body>
+</html>
