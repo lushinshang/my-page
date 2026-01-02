@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>系統架構圖表索引</title>
+    <title>Level 1: 系統環境圖 (Context)</title>
     <style>
 
 /* ===== CSS 主題系統 ===== */
@@ -400,67 +400,17 @@ footer {
 <body>
     <div class="wrapper">
         <div class="header">
-            <h1>📋 系統架構圖表索引</h1>
-            <div class="meta">Word count: 1283</div>
+            <h1>Level 1: 系統環境圖 (Context)</h1>
+            <div class="meta">Word count: 580</div>
         </div>
 
         <div class="toc-section" id="smart-toc" style="display: none;">
             <h3>📑 快速導航</h3>
             <nav class="toc-grid">
                 <div class="toc"><span class="toctitle">目錄</span><ul>
-<li><a href="#_1">📋 系統架構圖表索引</a><ul>
-<li><a href="#_2">📌 快速导航</a></li>
-<li><a href="#c4">🔷 C4 環境圖</a><ul>
 <li><a href="#level-1-context">Level 1: 系統環境圖 (Context)</a></li>
 </ul>
-</li>
-<li><a href="#c4_1">🔷 C4 容器圖</a><ul>
-<li><a href="#level-2-container">Level 2: 容器圖 (Container)</a></li>
-</ul>
-</li>
-<li><a href="#_3">📊 時序圖</a><ul>
-<li><a href="#33-web_article_mainpy">3.3 網頁分析流程 (web_article_main.py)</a></li>
-<li><a href="#34-pdf-pdf_article_mainpy">3.4 PDF 分析流程 (pdf_article_main.py)</a></li>
-</ul>
-</li>
-<li><a href="#_4">🏗️ 类圖</a><ul>
-<li><a href="#41">4.1 核心類別架構</a></li>
-<li><a href="#_5">類別繼承結構</a></li>
-</ul>
-</li>
-<li><a href="#_6">➡️ 流程圖</a><ul>
-<li><a href="#_7">逐字稿處理資料流</a></li>
-<li><a href="#_8">網頁分析資料流</a></li>
-<li><a href="#pdf">PDF 分析資料流</a></li>
-<li><a href="#_9">錯誤處理流程</a></li>
-<li><a href="#_10">分段處理策略</a></li>
-</ul>
-</li>
-<li><a href="#_11">📈 关系圖</a><ul>
-<li><a href="#31-generatorpy">3.1 逐字稿處理模組 (generator.py)</a></li>
-<li><a href="#32-gemini-gemini_clientpy">3.2 Gemini 客戶端 (gemini_client.py)</a></li>
-<li><a href="#_12">分層架構</a></li>
-</ul>
-</li>
-<li><a href="#_13">🔄 狀態圖</a><ul>
-<li><a href="#api-key">API Key 輪替機制</a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
 </div>
-
-<nav class="toc-grid">
-  <a href="#_2">📌 快速导航</a>
-  <a href="#c4">🔷 C4 環境圖</a>
-  <a href="#c4_1">🔷 C4 容器圖</a>
-  <a href="#_3">📊 時序圖</a>
-  <a href="#_4">🏗️ 类圖</a>
-  <a href="#_6">➡️ 流程圖</a>
-  <a href="#_11">📈 关系圖</a>
-  <a href="#_13">🔄 狀態圖</a>
-</nav>
 
             </nav>
         </div>
@@ -468,133 +418,22 @@ footer {
         <div class="content">
             <section>
 
-<blockquote>
-<strong>exam31_notemaker</strong> - AI 驱动智能笔记生成系統架構可视化
-</blockquote>
+<strong>圖表類型</strong>：C4Context
 
-本頁面包含系統完整的架構设计文档，共 <strong>15 个</strong> 圖表。
-
-
+<strong>描述</strong>：1. <a href="#c4-架構圖">C4 架構圖</a>
+<div class="mermaid">C4Context
+    title 系統環境圖 - exam21_notemaker
+    Person(user, "使用者", "需要處理逐字稿、<br/>網頁、PDF 的用戶")
+    System(notemaker, "exam21_notemaker", "AI 驅動的智能筆記<br/>生成系統")
+    System_Ext(gemini, "Google Gemini API", "AI 語言模型服務<br/>(2.5 Pro / 2.0 Flash)")
+    System_Ext(docling, "IBM Docling", "PDF 文檔解析引擎")
+    System_Ext(web, "網際網路", "網頁內容來源")
+    Rel(user, notemaker, "上傳檔案 / 提供 URL", "CLI / Shell")
+    Rel(notemaker, gemini, "呼叫 API", "HTTPS/REST")
+    Rel(notemaker, docling, "解析 PDF", "Python SDK")
+    Rel(notemaker, web, "抓取網頁", "HTTP/HTTPS")</div>
 </section><section>
-<h2 id="_2">📌 快速导航</h2>
-<ul>
-<li><strong>🔷 C4 環境圖</strong>（1 个）</li>
-<li>
-<strong>🔷 C4 容器圖</strong>（1 个）
-</li>
-<li>
-<strong>📊 時序圖</strong>（2 个）
-</li>
-<li>
-<strong>🏗️ 类圖</strong>（2 个）
-</li>
-<li>
-<strong>➡️ 流程圖</strong>（5 个）
-</li>
-<li>
-<strong>📈 关系圖</strong>（3 个）
-</li>
-<li>
-<strong>🔄 狀態圖</strong>（1 个）
-</li>
-</ul>
-</section><section>
-<h2 id="c4">🔷 C4 環境圖</h2>
-<h3 id="level-1-context"><a href="./01-level-1-系統環境圖-context.html">Level 1: 系統環境圖 (Context)</a></h3>
-<ol>
-<li><a href="#c4-架構圖">C4 架構圖</a></li>
-</ol>
-<strong>类型</strong>：C4Context | <strong>來源</strong>：<code>docs/ARCHITECTURE.md</code>
-</section><section>
-<h2 id="c4_1">🔷 C4 容器圖</h2>
-<h3 id="level-2-container"><a href="./02-level-2-容器圖-container.html">Level 2: 容器圖 (Container)</a></h3>
-
-Rel(user, notemaker, "上傳檔案 / 提供 URL", "CLI / Shell")
-
-<strong>类型</strong>：C4Container | <strong>來源</strong>：<code>docs/ARCHITECTURE.md</code>
-</section><section>
-<h2 id="_3">📊 時序圖</h2>
-<h3 id="33-web_article_mainpy"><a href="./05-3.3-網頁分析流程-web_article_main.py.html">3.3 網頁分析流程 (web_article_main.py)</a></h3>
-
-A --> |使用| C
-
-<strong>类型</strong>：sequenceDiagram | <strong>來源</strong>：<code>docs/ARCHITECTURE.md</code>
-</section><section>
-<h3 id="34-pdf-pdf_article_mainpy"><a href="./06-3.4-pdf-分析流程-pdf_article_main.py.html">3.4 PDF 分析流程 (pdf_article_main.py)</a></h3>
-
-U->>M: 提供 URL
-
-<strong>类型</strong>：sequenceDiagram | <strong>來源</strong>：<code>docs/ARCHITECTURE.md</code>
-</section><section>
-<h2 id="_4">🏗️ 类圖</h2>
-<h3 id="41"><a href="./07-4.1-核心類別架構.html">4.1 核心類別架構</a></h3>
-
-C-->>M: 返回完整報告
-
-<strong>类型</strong>：classDiagram | <strong>來源</strong>：<code>docs/ARCHITECTURE.md</code>
-</section><section>
-<h3 id="_5"><a href="./08-類別繼承結構.html">類別繼承結構</a></h3>
-<ol>
-<li><code>validate_and_fix()</code>：Mermaid 三層 QA（驗證→修復→再驗證）</li>
-</ol>
-<strong>类型</strong>：classDiagram | <strong>來源</strong>：<code>docs/ARCHITECTURE.md</code>
-</section><section>
-<h2 id="_6">➡️ 流程圖</h2>
-<h3 id="_7"><a href="./10-逐字稿處理資料流.html">逐字稿處理資料流</a></h3>
-<ol>
-<li><strong>處理層 (Processing Layer)</strong>：</li>
-</ol>
-<strong>类型</strong>：flowchart | <strong>來源</strong>：<code>docs/ARCHITECTURE.md</code>
-</section><section>
-<h3 id="_8"><a href="./11-網頁分析資料流.html">網頁分析資料流</a></h3>
-
-D --> F[清理 .srt 時間戳分割文檔]
-
-<strong>类型</strong>：flowchart | <strong>來源</strong>：<code>docs/ARCHITECTURE.md</code>
-</section><section>
-<h3 id="pdf"><a href="./12-pdf-分析資料流.html">PDF 分析資料流</a></h3>
-
-C --> D[提取圖片驗證 URL]
-
-<strong>类型</strong>：flowchart | <strong>來源</strong>：<code>docs/ARCHITECTURE.md</code>
-</section><section>
-<h3 id="_9"><a href="./14-錯誤處理流程.html">錯誤處理流程</a></h3>
-
-等待重試 --> API調用: 同一 Key
-
-<strong>类型</strong>：flowchart | <strong>來源</strong>：<code>docs/ARCHITECTURE.md</code>
-</section><section>
-<h3 id="_10"><a href="./15-分段處理策略.html">分段處理策略</a></h3>
-
-B -->|服務不可用| F[延遲 5 秒]
-
-<strong>类型</strong>：flowchart | <strong>來源</strong>：<code>docs/ARCHITECTURE.md</code>
-</section><section>
-<h2 id="_11">📈 关系圖</h2>
-<h3 id="31-generatorpy"><a href="./03-3.1-逐字稿處理模組-generator.py.html">3.1 逐字稿處理模組 (generator.py)</a></h3>
-
-| <strong>run.sh</strong> | Bash Script | 互動式主選單，引導使用者選擇功能 | Python 執行環境 |
-
-<strong>类型</strong>：graph | <strong>來源</strong>：<code>docs/ARCHITECTURE.md</code>
-</section><section>
-<h3 id="32-gemini-gemini_clientpy"><a href="./04-3.2-gemini-客戶端-gemini_client.py.html">3.2 Gemini 客戶端 (gemini_client.py)</a></h3>
-
-A --> |委派| B
-
-<strong>类型</strong>：graph | <strong>來源</strong>：<code>docs/ARCHITECTURE.md</code>
-</section><section>
-<h3 id="_12"><a href="./09-分層架構.html">分層架構</a></h3>
-
-return response.text
-
-<strong>类型</strong>：graph | <strong>來源</strong>：<code>docs/ARCHITECTURE.md</code>
-</section><section>
-<h2 id="_13">🔄 狀態圖</h2>
-<h3 id="api-key"><a href="./13-api-key-輪替機制.html">API Key 輪替機制</a></h3>
-
-H --> K[gemini_client.py深度分析]
-
-<strong>类型</strong>：stateDiagram-v2 | <strong>來源</strong>：<code>docs/ARCHITECTURE.md</code>
+<strong>來源</strong>：<code>docs/ARCHITECTURE.md</code>
 </section>
         </div>
 
@@ -691,5 +530,28 @@ window.addEventListener('load', initTheme);
 </script>
 
     
+            <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+            <script>
+                if (typeof mermaid !== 'undefined') {
+                    mermaid.initialize({ startOnLoad: false, theme: 'default' });
+                    const mermaidNodes = document.querySelectorAll('.mermaid');
+                    mermaidNodes.forEach((node, index) => {
+                        const code = (node.textContent || '').trim();
+                        if (!code) {
+                            return;
+                        }
+                        const id = `mermaid-${index}`;
+                        mermaid.render(id, code).then(({ svg, bindFunctions }) => {
+                            node.innerHTML = svg;
+                            if (bindFunctions) {
+                                bindFunctions(node);
+                            }
+                        }).catch((err) => {
+                            console.error('Mermaid render error:', err);
+                        });
+                    });
+                }
+            </script>
+            
 </body>
 </html>
