@@ -422,17 +422,27 @@ footer {
 
 <strong>描述</strong>：2. <strong>處理層 (Processing Layer)</strong>：
 <div class="mermaid">flowchart LR
-    A[逐字稿檔案<br/>.txt/.md/.srt] --> B{檔案大小}
-    B -->|小於閾值| C[generator.py<br/>單次生成]
-    B -->|大於閾值| D[chunked_generator.py<br/>分段處理]
-    C --> E[載入 Prompt 模板<br/>transcript/*.txt]
-    D --> F[清理 .srt 時間戳<br/>分割文檔]
-    E --> G[gemini_client.py<br/>API 調用]
-    F --> H[逐段生成<br/>載入模板]
-    H --> I[gemini_client.py<br/>多次 API 調用]
-    I --> J[AI 智能合併<br/>internal/merge_chunks.txt]
+    A[逐字稿檔案
+.txt/.md/.srt] --> B{檔案大小}
+    B -->|小於閾值| C[generator.py
+單次生成]
+    B -->|大於閾值| D[chunked_generator.py
+分段處理]
+    C --> E[載入 Prompt 模板
+transcript/*.txt]
+    D --> F[清理 .srt 時間戳
+分割文檔]
+    E --> G[gemini_client.py
+API 調用]
+    F --> H[逐段生成
+載入模板]
+    H --> I[gemini_client.py
+多次 API 調用]
+    I --> J[AI 智能合併
+internal/merge_chunks.txt]
     J --> G
-    G --> K[儲存 Markdown<br/>output/*.md]
+    G --> K[儲存 Markdown
+output/*.md]
     style A fill:#FFE5B4
     style C fill:#4A90E2
     style D fill:#4A90E2

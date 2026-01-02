@@ -423,20 +423,26 @@ footer {
 <strong>描述</strong>：B -->|服務不可用| F[延遲 5 秒]
 <div class="mermaid">flowchart TD
     A[輸入文檔] --> B{檔案類型}
-    B -->|.srt| C[清理時間戳<br/>移除行號]
+    B -->|.srt| C[清理時間戳
+移除行號]
     B -->|其他| D[直接讀取]
     C --> E[計算字元數]
     D --> E
     E --> F{是否超過閾值}
     F -->|否| G[單次生成]
     F -->|是| H[智能分段]
-    H --> I[按換行分割<br/>每段 50K 字元]
-    I --> J[處理超長單行<br/>強制分割]
-    J --> K[逐段生成筆記<br/>添加段落提示]
+    H --> I[按換行分割
+每段 50K 字元]
+    I --> J[處理超長單行
+強制分割]
+    J --> K[逐段生成筆記
+添加段落提示]
     K --> L[所有段落完成]
-    L --> M[載入合併模板<br/>internal/merge_chunks.txt]
+    L --> M[載入合併模板
+internal/merge_chunks.txt]
     M --> N[AI 智能合併]
-    N --> O[去除分段標記<br/>合併重複內容]
+    N --> O[去除分段標記
+合併重複內容]
     O --> P[輸出完整筆記]
     G --> P
     style G fill:#4A90E2

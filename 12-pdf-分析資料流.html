@@ -422,21 +422,31 @@ footer {
 
 <strong>描述</strong>：C --> D[提取圖片驗證 URL]
 <div class="mermaid">flowchart LR
-    A[PDF 檔案] --> B[pdf_preprocessor_docling.py<br/>Docling 解析]
-    B --> C[Markdown 轉換<br/>保留結構]
-    C --> D[提取圖片<br/>儲存到 output/pdf_images/]
+    A[PDF 檔案] --> B[pdf_preprocessor_docling.py
+Docling 解析]
+    B --> C[Markdown 轉換
+保留結構]
+    C --> D[提取圖片
+儲存到 output/pdf_images/]
     D --> E[提取標題]
-    E --> F[生成 Deep Research<br/>背景知識]
+    E --> F[生成 Deep Research
+背景知識]
     F --> G{內容長度}
-    G -->|< 50K 字元| H[直接分析<br/>article_analysis/深度分析.txt]
-    G -->|> 50K 字元| I[分段處理<br/>逐段分析]
-    I --> J[AI 合併<br/>整合報告]
+    G -->|< 50K 字元| H[直接分析
+article_analysis/深度分析.txt]
+    G -->|> 50K 字元| I[分段處理
+逐段分析]
+    I --> J[AI 合併
+整合報告]
     J --> H
-    H --> K[gemini_client.py<br/>深度分析]
-    K --> L[report_utils.py<br/>生成摘要與總結]
+    H --> K[gemini_client.py
+深度分析]
+    K --> L[report_utils.py
+生成摘要與總結]
     L --> M[插入摘要與總結]
     M --> N[驗證報告中的 URL]
-    N --> O[儲存 Markdown<br/>output/*.md]
+    N --> O[儲存 Markdown
+output/*.md]
     style A fill:#FFE5B4
     style B fill:#50C878
     style K fill:#9370DB

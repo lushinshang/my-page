@@ -422,17 +422,27 @@ footer {
 
 <strong>描述</strong>：D --> F[清理 .srt 時間戳分割文檔]
 <div class="mermaid">flowchart LR
-    A[網頁 URL] --> B[web_preprocessor.py<br/>抓取網頁]
-    B --> C[提取內容<br/>清理雜訊]
-    C --> D[提取圖片<br/>驗證 URL]
-    D --> E[生成 Deep Research<br/>背景知識]
-    E --> F[組合完整 Prompt<br/>article_analysis/深度分析.txt]
-    F --> G[gemini_client.py<br/>深度分析]
-    G --> H[report_utils.py<br/>生成摘要與總結]
-    H --> I[gemini_client.py<br/>二次調用]
+    A[網頁 URL] --> B[web_preprocessor.py
+抓取網頁]
+    B --> C[提取內容
+清理雜訊]
+    C --> D[提取圖片
+驗證 URL]
+    D --> E[生成 Deep Research
+背景知識]
+    E --> F[組合完整 Prompt
+article_analysis/深度分析.txt]
+    F --> G[gemini_client.py
+深度分析]
+    G --> H[report_utils.py
+生成摘要與總結]
+    H --> I[gemini_client.py
+二次調用]
     I --> J[插入摘要與總結]
-    J --> K[驗證報告中的 URL<br/>並行檢查]
-    K --> L[儲存 Markdown<br/>output/*.md]
+    J --> K[驗證報告中的 URL
+並行檢查]
+    K --> L[儲存 Markdown
+output/*.md]
     style A fill:#FFE5B4
     style B fill:#50C878
     style G fill:#9370DB
